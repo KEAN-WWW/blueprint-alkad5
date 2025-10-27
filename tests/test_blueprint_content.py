@@ -1,18 +1,19 @@
-"""This is a test script to test flask application"""
-from wsgi import app
-
-
+import pytest
+from application.app import init_app
 
 @pytest.fixture(name="client")
-def create_client():
-    """initialize a fixture test client for flask unit testing"""
-    with app.test_client() as app_client:
-        yield app_client
+def client():
+    app = init_app()
+    app.config.update(TESTING=True)
+    with app.test_client() as client:
+        yield client
 
 def test_main_page_content(client):
-    """flask unit testing for content in default page"""
-
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert b"Blueprint" in resp.data
 
 def test_about_page_content(client):
-    """flask unit testing for content in about page"""
-
+    resp = client.get("/about")
+    assert resp.status_code == 200
+    assert b"Blueprint" in resp.data
